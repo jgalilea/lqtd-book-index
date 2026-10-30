@@ -1,6 +1,26 @@
 {
   "episodes": [
     {
+      "id": "0a738aee-4437-42b7-8e88-8264267d1b93",
+      "title": "ÚLTIMA HORA | Accidente de tren de Toledo: \"Sabíamos que esto pasaría\"",
+      "number": null,
+      "part": null,
+      "kind": "ultima-hora",
+      "published": "2026-10-30T13:00:01+00:00",
+      "duration_seconds": 4230,
+      "description": "Tras el grave accidente ferroviario de Toledo, hablamos con Víctor (nombre ficticio), un maquinista en activo que ha decidido romper su silencio y ofrecer su testimonio desde el anonimato por temor a posibles represalias.\n\nSu relato dibuja una realidad preocupante sobre el funcionamiento del ferrocarril español: averías recurrentes, deficiencias en el mantenimiento de las infraestructuras, fallos en los sistemas de seguridad, formación insuficiente de algunos responsables de circulación y una presión constante para evitar retrasos.\n\nVíctor asegura que los maquinistas se enfrentan habitualmente a errores e incidencias que, en muchas ocasiones, consiguen resolver antes de que tengan consecuencias graves. También denuncia que determinadas anomalías se han normalizado hasta el punto de formar parte del día a día.\n\n¿Qué ocurrió realmente en Toledo? ¿Cómo pudo producirse una colisión entre dos trenes? ¿Qué responsabilidad tienen los sistemas de seguridad, los responsables de circulación y las empresas ferroviarias? ¿Podría volver a suceder?\n\nUna conversación para intentar comprender las circunstancias de la tragedia, conocer el funcionamiento del ferrocarril desde dentro y plantear preguntas que merecen respuestas.\n\nLas afirmaciones del entrevistado corresponden a su experiencia y valoración profesional. Las causas y responsabilidades del accidente deberán ser determinadas por la investigación oficial.",
+      "links": [],
+      "audio_url": "https://traffic.megaphone.fm/APO1232324506.mp3",
+      "image": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/43154990/ff0931e5f596572c.jpg",
+      "spotify_url": "https://podcasters.spotify.com/pod/show/alex-fidalgo4/episodes/LTIMA-HORA--Accidente-de-tren-de-Toledo-Sabamos-que-esto-pasara-e3rcif7",
+      "ivoox_url": "https://www.ivoox.com/ultima-hora-accidente-tren-toledo-sabiamos-audios-mp3_rf_183036684_1.html",
+      "youtube_url": "https://www.youtube.com/watch?v=hv3vjQlxNVA",
+      "first_seen": "2026-10-30T14:41:34+00:00",
+      "ivoox_id": "183036684",
+      "youtube_id": "hv3vjQlxNVA",
+      "amazon_url": "https://music.amazon.es/podcasts/8d40639a-0141-4f6f-8461-5a237bfdbc48/episodes/f30f3dd6-d8c6-42a7-9bfe-5abb4a77b735/lo-que-t%C3%BA-digas-con-alex-fidalgo-%C3%BAltima-hora-accidente-de-tren-de-toledo-sab%C3%ADamos-que-esto-pasar%C3%ADa"
+    },
+    {
       "id": "7d41ae2c-b112-415f-9670-60e155907cd6",
       "title": "\"Las Cosas que Me Han Hecho, Romperían a Cualquiera\" | Raúl Sánchez (síndrome de Pentinnen) - #562",
       "number": 562,
@@ -12091,5 +12111,5 @@
       "amazon_url": "https://music.amazon.es/podcasts/8d40639a-0141-4f6f-8461-5a237bfdbc48/episodes/0347b5e0-e440-4da8-a677-1de896db2499/lo-que-t%C3%BA-digas-con-alex-fidalgo-1-jm-mulet---ciencia-nutrici%C3%B3n-y-medicina-y-pseudomedicina"
     }
   ],
-  "updated_at": "2026-10-27T13:45:30+00:00"
+  "updated_at": "2026-10-30T14:41:43+00:00"
 }
