@@ -74,6 +74,32 @@ Para los episodios con vídeo que no estén en `transcripts_checked`:
 
 Es reanudable: guarda tras cada episodio y, si Gemini no está disponible, para y sigue en la siguiente ejecución.
 
+### Un libro, una ficha: `scripts/titles.py`
+
+Un mismo libro puede aparecer con su título original y con el de la traducción («Outliers» / «Fuera de serie») o con dos versiones de un título mal transcrito. `update_local.sh` ejecuta `titles.py` después de `transcripts.py`:
+
+1. Gemini da, para cada libro nuevo, el título original (`original_title`) y el publicado en España (si es otro, va a `aka`). La web busca por todos ellos y la ficha enseña el título original.
+2. Los libros del mismo autor que comparten algún título se fusionan en uno (se queda el de título en español). El id del fusionado queda en `old_ids`, así que sus enlaces `/#id` y la «Mi lista» de cada navegador siguen funcionando.
+3. Los de títulos muy parecidos solo se proponen, porque a veces son libros distintos («Breve historia del tiempo» / «Brevísima historia del tiempo»):
+
+   ```sh
+   python3 scripts/titles.py --merge ID_QUE_SE_QUEDA ID_QUE_SE_VA   # son el mismo
+   python3 scripts/titles.py --distinct ID1 ID2                     # no lo son
+   ```
+
+   Las parejas `--distinct` se guardan en `not_duplicates` y no se vuelven a proponer ni a fusionar, aunque Gemini les dé un título en común.
+
+### Tests
+
+```sh
+python3 -m unittest discover tests
+```
+
+- `tests/test_titles.py` prueba la lógica de títulos y fusiones con libros de ejemplo, sin red ni Gemini: qué libro se queda, qué se suma, los `--distinct`, que un libro se encuentre por su título en cualquier idioma…
+- `tests/test_data.py` revisa `data/books.json`: ids únicos, `old_ids` que no chocan, duplicados sin fusionar, que todos los títulos lleguen a la búsqueda de la web y que no se hayan vuelto a fusionar libros que ya se fusionaron mal una vez («Crimen y castigo» / «Los demonios»).
+
+La Action los ejecuta antes de publicar la web y `update_local.sh`, antes de hacer push.
+
 ## Web
 
 HTML, CSS y JS sin dependencias, en `site/`. `scripts/build_site.py` la copia a `_site/` junto con un `books.json` compacto que ya incluye los datos de los episodios:
@@ -81,6 +107,8 @@ HTML, CSS y JS sin dependencias, en `site/`. `scripts/build_site.py` la copia a 
 ```sh
 python3 scripts/build_site.py && python3 -m http.server -d _site
 ```
+
+Con Pillow instalado (`pip install -r requirements.txt`), la build descarga además las portadas y las sirve desde la propia web como miniaturas WebP de 200 y 400 px (`_site/covers/`), que el navegador elige según la pantalla. Pesan unas 5 veces menos que las originales de Open Library y no dependen de su velocidad. Las descargas quedan en `.cache/covers/` (en la Action, en la caché de GitHub), así que cada build solo descarga las portadas nuevas. Sin Pillow, o si una descarga falla, se enlaza la portada original.
 
 Portada con estanterías por temática, buscador (libro, autor, temática o episodio), filtros por temática en la URL (`?tema=salud`) y una ficha por libro (`/#id-del-libro`) con dónde comprarlo y los episodios en los que se habló de él. Los libros sin portada en Open Library muestran una portada generada con el color de su temática.
 

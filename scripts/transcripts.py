@@ -136,7 +136,9 @@ hablan de la película o la serie basada en un libro, no la incluyas; solo si ha
 - Título y autor reales: nunca «Desconocido», «Varios» ni «Anónimo» salvo en clásicos anónimos.
 - La transcripción tiene errores en los nombres propios: corrige título y autor a como \
 se conocen en España (por ejemplo «Jonathan Heide» -> Jonathan Haidt). Si un libro \
-extranjero tiene título en español, usa el español.
+extranjero tiene título en español, usa el español aunque lo digan en el idioma original.
+- "original_title": si el libro se escribió en otro idioma, su título original \
+(«Outliers» para «Fuera de serie»); si se escribió en español, cadena vacía.
 - No inventes: si no sabes con seguridad qué libro es, no lo incluyas.
 - "t" es la marca [m:ss] más cercana a donde se menciona por primera vez.
 - "by": quién lo menciona: "Álex", "invitado" o el nombre de la persona.
@@ -155,6 +157,7 @@ SCHEMA = {
         "type": "OBJECT",
         "properties": {
             "title": {"type": "STRING"},
+            "original_title": {"type": "STRING"},
             "author": {"type": "STRING"},
             "t": {"type": "STRING"},
             "by": {"type": "STRING"},
@@ -167,10 +170,10 @@ SCHEMA = {
 }
 
 
-def ask_gemini(prompt, key, models):
+def ask_gemini(prompt, key, models, schema=SCHEMA):
     body = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "responseSchema": SCHEMA,
+        "generationConfig": {"responseMimeType": "application/json", "responseSchema": schema,
                              "temperature": 0.1},
     }).encode()
     for model in models:
@@ -213,13 +216,15 @@ def to_seconds(t):
     return int(m.group(1)) * 60 + int(m.group(2)) if m else None
 
 
-def find_book(books, title, author):
-    nt, na = norm(title), norm(author).split()
+def find_book(books, titles, author):
+    """El libro que ya está en books con alguno de esos títulos (en cualquier
+    idioma: se compara también con `aka` y `original_title`) y un autor compatible."""
+    nts, na = [norm(t) for t in titles if t], norm(author).split()
     for b in books:
-        bt = norm(b["title"])
-        if bt == nt or (len(nt) > 6 and (nt in bt or bt in nt)):
-            if not na or not norm(b.get("author", "")) or set(na) & set(norm(b["author"]).split()):
-                return b
+        for bt in [norm(t) for t in [b["title"], *b.get("aka", []), b.get("original_title")] if t]:
+            if any(bt == nt or (len(nt) > 6 and (nt in bt or bt in nt)) for nt in nts):
+                if not na or not norm(b.get("author", "")) or set(na) & set(norm(b["author"]).split()):
+                    return b
     return None
 
 
@@ -236,9 +241,10 @@ def add_mentions(data, episode, found, verify, delay):
     added = 0
     for f in found:
         title, author = f["title"].strip(), f["author"].strip()
+        original = (f.get("original_title") or "").strip()
         if not title:
             continue
-        book = find_book(data["books"], title, author)
+        book = find_book(data["books"], [title, original], author)
         if book is None:
             book = {"id": book_id(title, author), "title": title, "author": author,
                     "themes": [t for t in f.get("themes", []) if t in THEMES][:2],
@@ -261,6 +267,8 @@ def add_mentions(data, episode, found, verify, delay):
                 for k, v in (info or {}).items():
                     if v:
                         book[k] = v
+            if original and norm(original) != norm(title):
+                book["original_title"] = original
             data["books"].append(book)
             added += 1
             log(f"  + «{title}» ({author}){' — revisar' if book.get('review') else ''}")
@@ -318,7 +326,9 @@ def main():
         except QuotaExhausted:
             log("Ningún modelo de Gemini disponible (sin cuota o saturados); se seguirá en la próxima ejecución.")
             break
-        kept = [f for f in found if said_in(f["title"], text)]
+        # Vale cualquiera de los dos títulos: dicen «Outliers» y Gemini lo
+        # devuelve como «Fuera de serie».
+        kept = [f for f in found if said_in(f["title"], text) or said_in(f.get("original_title") or "", text)]
         for f in found:
             if f not in kept:
                 log(f"   descartado (no se dice el título): «{f['title']}» — {f['author']}")

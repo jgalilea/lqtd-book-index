@@ -12,7 +12,7 @@ on:
     - cron: "0 21 * * *"
   push:
     branches: [main]
-    paths: ["site/**", "data/**", "scripts/build_site.py", ".github/workflows/**"]
+    paths: ["site/**", "data/**", "scripts/build_site.py", "scripts/titles.py", "scripts/transcripts.py", "tests/**", ".github/workflows/**"]
   workflow_dispatch:
 
 permissions:
@@ -36,13 +36,14 @@ jobs:
         with:
           python-version: "3.13"
 
+      - run: pip install -r requirements.txt
+
       - name: Obtener episodios nuevos y sus libros
         if: github.event_name != 'push'
         env:
           # Opcional: con una clave gratuita de Google Books hay más portadas.
           GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
         run: |
-          pip install -r requirements.txt
           python scripts/fetch_episodes.py
           python scripts/books.py
           # Los libros mencionados en la conversación (transcripts.py) se sacan en
@@ -69,6 +70,20 @@ jobs:
           git commit -m "Actualizar episodios ($(date -u +%F))"
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # Miniaturas de las portadas ya descargadas en builds anteriores: así
+      # solo se descargan las de los libros nuevos.
+      - uses: actions/cache@v4
+        if: steps.commit.outputs.changed == 'true' || github.event_name != 'schedule'
+        with:
+          path: .cache/covers
+          key: covers-${{ github.run_id }}
+          restore-keys: covers-
+
+      # Datos coherentes (ids, fusiones, títulos) antes de publicar.
+      - name: Tests
+        if: steps.commit.outputs.changed == 'true' || github.event_name != 'schedule'
+        run: python -m unittest discover tests
 
       - name: Construir la web
         if: steps.commit.outputs.changed == 'true' || github.event_name != 'schedule'

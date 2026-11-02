@@ -28,6 +28,7 @@ fi
 git pull --rebase --autostash -q
 
 .venv/bin/python scripts/transcripts.py "$@"
+.venv/bin/python scripts/titles.py              # títulos en otros idiomas y duplicados
 .venv/bin/python scripts/books.py --no-detect   # fichas y portadas de los libros nuevos
 
 if git diff --quiet -- data/; then
@@ -35,6 +36,8 @@ if git diff --quiet -- data/; then
   exit 0
 fi
 git --no-pager diff --stat -- data/
+# Si una fusión o un título ha dejado los datos incoherentes, no se sube nada.
+.venv/bin/python -m unittest discover -q tests || { echo "Fallan los tests: revisa data/books.json antes de subirlo." >&2; exit 1; }
 if [[ -n "${NO_PUSH:-}" ]]; then
   echo "NO_PUSH: cambios sin subir."
   exit 0
