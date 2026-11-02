@@ -27,7 +27,7 @@ let books = [];
 let themes = {};
 const byId = new Map();
 const epBooks = new Map(); // episodio -> libros de los que se habló en él
-const epKey = (e) => `${e.date}|${e.title}`;
+const epKey = (e) => e.e; // número del episodio en books.json
 const state = { q: "", theme: "", rel: "", sort: "new" };
 
 // --- Mi lista: libros guardados, solo en este navegador ----------------------
@@ -50,20 +50,26 @@ const fmtDate = (d) => (d ? dateFmt.format(new Date(d + "T12:00:00")) : "");
 const hue = (b) => HUES[b.th?.[0]] ?? 25;
 const collator = new Intl.Collator("es", { sensitivity: "base" });
 
-function coverHTML(b) {
-  const gen = `<div class="gen"><span class="gt">${esc(b.t)}</span><span class="ga">${esc(b.a || "")}</span></div>`;
+const genHTML = (b) => `<div class="gen"><span class="gt">${esc(b.t)}</span><span class="ga">${esc(b.a || "")}</span></div>`;
+
+// Portada: miniaturas WebP de la propia web (b.img, ver build_site.py) o, si
+// no se pudieron generar, el enlace original. `size` es el ancho en pantalla.
+function coverHTML(b, { size = 160, eager = false } = {}) {
+  const load = eager ? `fetchpriority="high"` : `loading="lazy"`;
+  const img = b.img
+    ? `<img class="cv" src="covers/${b.img}-200.webp" srcset="covers/${b.img}-200.webp 200w, covers/${b.img}-400.webp 400w" sizes="${size}px"`
+    : b.cover ? `<img class="cv" src="${esc(b.cover)}"` : "";
   return `<div class="cover" style="--h:${hue(b)}">` +
     (b.m ? `<span class="ribbon">Mencionado</span>` : "") +
-    (b.cover ? `<img class="cv" src="${esc(b.cover)}" alt="" loading="lazy" decoding="async">` +
-      `<template>${gen}</template>` : gen) + `</div>`;
+    (img ? `${img} alt="" ${load} decoding="async" data-id="${esc(b.id)}">` : genHTML(b)) + `</div>`;
 }
 
-// Portada que no carga (Open Library a veces falla): se sustituye por la generada.
+// Portada que no carga: se sustituye por la generada.
 document.addEventListener("error", (ev) => {
   const img = ev.target;
   if (img.tagName === "IMG" && img.classList.contains("cv")) {
-    const tpl = img.nextElementSibling;
-    if (tpl?.tagName === "TEMPLATE") img.replaceWith(tpl.content.cloneNode(true));
+    const b = byId.get(img.dataset.id);
+    if (b) img.outerHTML = genHTML(b);
   }
 }, true);
 
@@ -218,7 +224,7 @@ function alsoHTML(e, current) {
 
 function epHTML(e, current) {
   const thumb = e.yt
-    ? `<img src="https://i.ytimg.com/vi/${esc(e.yt)}/mqdefault.jpg" alt="" loading="lazy">`
+    ? `<img src="https://i.ytimg.com/vi/${esc(e.yt)}/mqdefault.jpg" alt="" loading="lazy" decoding="async">`
     : (e.n ? `#${e.n}` : "LQTD");
   const links = PLATFORMS.filter(([k]) => e[k]).map(([k, name, color, url]) =>
     `<a href="${esc(url(e[k]))}" target="_blank" rel="noopener"><span class="dot" style="background:${color}"></span>${name}</a>`).join("");
@@ -278,12 +284,13 @@ function closeDetail() {
 
 function openDetail(b, push = true) {
   els.dialog.querySelector(".d-wrap").style.setProperty("--h", hue(b));
-  $("d-cover").innerHTML = coverHTML(b).replace('loading="lazy"', 'fetchpriority="high"');
+  $("d-cover").innerHTML = coverHTML(b, { size: 200, eager: true });
   $("d-rel").textContent = b.m ? "Mencionado en el episodio" : "Libro del invitado";
   $("d-tags").innerHTML = (b.th || []).map(tagHTML).join("");
   $("d-title").textContent = b.t;
   $("d-author").textContent = b.a || "";
-  $("d-meta").textContent = [b.y, b.pub, b.isbn && `ISBN ${b.isbn}`].filter(Boolean).join(" · ");
+  const orig = b.orig && norm(b.orig) !== norm(b.t) ? `Título original: ${b.orig}` : "";
+  $("d-meta").textContent = [orig, b.y, b.pub, b.isbn && `ISBN ${b.isbn}`].filter(Boolean).join(" · ");
   $("d-buy").innerHTML = buyLinks(b);
   renderSaveButton(b);
   $("d-report").href = reportURL(b);
@@ -405,9 +412,18 @@ async function init() {
   books = data.books;
   books.forEach((b) => {
     b.date ||= "";
-    b._hay = norm([b.t, b.a, b.pub, b.isbn, ...(b.th || []).map((t) => themes[t]),
+    // Cada libro trae solo el número de sus episodios (y la mención): se unen aquí.
+    b.eps = (b.eps || []).map((r) => ({ ...data.eps[r.e], ...r }));
+    // Se busca también por el título original y las otras formas del título.
+    b._hay = norm([b.t, b.orig, ...(b.aka || []), b.a, b.pub, b.isbn, ...(b.th || []).map((t) => themes[t]),
       ...(b.eps || []).map((e) => `${e.title} #${e.n || ""}`)].join(" "));
     byId.set(b.id, b);
+    // Libros fusionados con este (mismo libro con otro título): sus enlaces
+    // (/#id) llevan a este y, si estaban en «Mi lista», se pasan a este.
+    for (const old of b.old || []) {
+      byId.set(old, b);
+      if (myList.has(old)) { toggleSaved(old); if (!myList.has(b.id)) toggleSaved(b.id); }
+    }
     for (const e of b.eps || []) {
       if (!epBooks.has(epKey(e))) epBooks.set(epKey(e), []);
       epBooks.get(epKey(e)).push(b);
@@ -416,7 +432,7 @@ async function init() {
   els.q.value = state.q;
   els.sort.value = state.sort;
   els.rel.value = state.rel;
-  const eps = new Set(books.flatMap((b) => (b.eps || []).map((e) => e.title))).size;
+  const eps = data.eps.length;
   const mentioned = books.filter((b) => b.m).length;
   els.lede.textContent = `${books.length - mentioned} libros de los invitados de Álex Fidalgo y ${mentioned} mencionados en sus conversaciones, de ${eps} episodios, ordenados por temática.`;
   if (data.updated) els.updated.textContent = `Actualizado el ${fmtDate(data.updated.slice(0, 10))}.`;
