@@ -9739,7 +9739,9 @@
           "quote": "Hay un libro muy interesante que se llama El tercer cerebro en referencia al móvil."
         }
       ],
-      "review": true
+      "review": true,
+      "lookup": "none",
+      "cover_lookup": "agapea"
     },
     {
       "id": "el-trap-filosofia-millennial-para-la-crisis-en-espana-ernesto-castro",
@@ -18862,7 +18864,12 @@
           "by": "Pedro",
           "quote": "Hay un libro muy bueno que dice mamá quiero ser youtuber y lo explica muy bien la chica que lo escribe."
         }
-      ]
+      ],
+      "isbn": "9789507301216",
+      "year": 2013,
+      "publisher": "No disponible",
+      "cover": "https://covers.openlibrary.org/b/id/12328817-L.jpg",
+      "lookup": "openlibrary"
     },
     {
       "id": "manifiesto-comunista-karl-marx",
@@ -26288,7 +26295,7 @@
       ]
     }
   ],
-  "updated_at": "2026-11-24T05:02:39+00:00",
+  "updated_at": "2026-11-25T03:50:56+00:00",
   "transcripts_checked": [
     "a2d4d6d8-21b4-41a9-82dc-d7cc05c42b90",
     "b342eb29-cd39-4885-b641-73ef294f870b",
