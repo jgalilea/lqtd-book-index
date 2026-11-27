@@ -1,6 +1,27 @@
 {
   "episodes": [
     {
+      "id": "c8e9ffc1-70b8-4055-aa3b-e8539affad5d",
+      "title": "Zatu (SFDK) se sincera como nunca sobre su vida - #570",
+      "number": 570,
+      "part": null,
+      "kind": "episodio",
+      "published": "2026-11-27T06:00:00+00:00",
+      "duration_seconds": 6181,
+      "description": "Zatu, una de las grandes figuras de la historia del rap español, protagoniza una de las conversaciones más personales y emocionantes de LO QUE TÚ DIGAS.\n\nHablamos de sus treinta años junto a Acción Sánchez, del éxito, el dinero, las adicciones y su particular manera de entender la felicidad. También de la paternidad, del acoso escolar que sufrió su hija y de cómo convertirse en padre cambió su relación con la vida y la muerte.\n\nHay tiempo para hablar de música, de la evolución del rap y de Salto de fe, el nuevo disco de SFDK, con el que siguen reinventándose después de tres décadas de trayectoria.\n\nUna charla llena de humor, contradicciones, reflexiones y momentos de enorme sinceridad para conocer a Zatu más allá de los escenarios.",
+      "links": [],
+      "audio_url": "https://traffic.megaphone.fm/APO9443661152.mp3",
+      "image": "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/43154990/ff0931e5f596572c.jpg",
+      "spotify_url": "https://podcasters.spotify.com/pod/show/alex-fidalgo4/episodes/Zatu-SFDK-se-sincera-como-nunca-sobre-su-vida---570-e3t3ccf",
+      "ivoox_url": "https://www.ivoox.com/zatu-sfdk-se-sincera-como-nunca-sobre-su-audios-mp3_rf_184481876_1.html",
+      "youtube_url": "https://www.youtube.com/watch?v=jVj3DPIewfk",
+      "first_seen": "2026-11-27T17:44:18+00:00",
+      "ivoox_id": "184481876",
+      "youtube_id": "jVj3DPIewfk",
+      "apple_url": "https://podcasts.apple.com/es/podcast/zatu-sfdk-se-sincera-como-nunca-sobre-su-vida-570/id1245349669?i=1000804321204",
+      "amazon_url": "https://music.amazon.es/podcasts/8d40639a-0141-4f6f-8461-5a237bfdbc48/episodes/a54fb299-0915-449d-8cf7-f4d71de8aac9/lo-que-t%C3%BA-digas-con-alex-fidalgo-zatu-sfdk-se-sincera-como-nunca-sobre-su-vida---570"
+    },
+    {
       "id": "6053cc26-bfaa-4659-a315-137804ea04cd",
       "title": "El Tabú de Los Padres Psicópatas: Así Es Crecer con Uno | Vicente Garrido - #569",
       "number": 569,
@@ -12283,5 +12304,5 @@
       "amazon_url": "https://music.amazon.es/podcasts/8d40639a-0141-4f6f-8461-5a237bfdbc48/episodes/0347b5e0-e440-4da8-a677-1de896db2499/lo-que-t%C3%BA-digas-con-alex-fidalgo-1-jm-mulet---ciencia-nutrici%C3%B3n-y-medicina-y-pseudomedicina"
     }
   ],
-  "updated_at": "2026-11-24T05:02:25+00:00"
+  "updated_at": "2026-11-27T17:44:25+00:00"
 }
